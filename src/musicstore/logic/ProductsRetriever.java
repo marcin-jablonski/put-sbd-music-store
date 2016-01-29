@@ -5,8 +5,13 @@
  */
 package musicstore.logic;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import musicstore.datastructures.FilterInfo;
 import musicstore.datastructures.ProductInfo;
 
@@ -16,38 +21,40 @@ import musicstore.datastructures.ProductInfo;
  */
 public class ProductsRetriever {
     public static List<ProductInfo> GetProducts(FilterInfo filters){
-        List<ProductInfo> mockInfo = new ArrayList<>();
-        ProductInfo mock1 = new ProductInfo();
-        ProductInfo mock2 = new ProductInfo();
-        ProductInfo mock3 = new ProductInfo();
+        List<ProductInfo> products = new ArrayList<>();
+        Connection conn = DBConnector.Connect();
         
-        //TODO: fill mockInfo
+        PreparedStatement stmt;
+        try{
+            if(filters == null){
+                stmt = conn.prepareStatement("SELECT BODY, PRICE, NAME, DESCRIPTION, STORAGESTATE, ID FROM GUITAR");
+            }
+            else{
+                stmt = conn.prepareStatement("SELECT BODY, PRICE, NAME, DESCRIPTION, STORAGESTATE, ID FROM GUITAR WHERE BODY = ?, PRICE BETWEEN ? AND ?, NAME LIKE ?");
+                stmt.setString(1, filters.getBody());
+                stmt.setFloat(2, filters.getPriceMin());
+                stmt.setFloat(3, filters.getPriceMax());
+                stmt.setString(4, filters.getProductName());
+            }
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()){
+                ProductInfo info = new ProductInfo();
+                info.setId(rs.getInt(6));
+                info.setProductAvailability(rs.getInt(5) > 0 ? true : false);
+                info.setProductDescription(rs.getString(4));
+                info.setProductName(rs.getString(3));
+                info.setProductPrice(rs.getFloat(2));
+                info.setProductStorageState(rs.getInt(5));
+                info.setProductImagePath("src/resources/productImages/sample.jpg");
+                products.add(info);
+            }
+            rs.close();
+            stmt.close();
+        } catch (Exception ex) {
+            Logger.getLogger(ProductsRetriever.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
-        mock1.setProductName("Gibson Les Paul Custom 2015 VS");
-        mock1.setProductAvailability(true);
-        mock1.setProductDescription("One and only, Gibson LP Custom!");
-        mock1.setProductPrice((float) 11999.99);
-        mock1.setProductStorageState(30);
-        mock1.setProductImagePath("src/resources/productImages/sample.jpg");
-        
-        mock2.setProductName("Gibson Les Paul Custom 2015 VS");
-        mock2.setProductAvailability(true);
-        mock2.setProductDescription("One and only, Gibson LP Custom!");
-        mock2.setProductPrice((float) 11999.99);
-        mock2.setProductStorageState(30);
-        mock2.setProductImagePath("src/resources/productImages/sample.jpg");
-        
-        mock3.setProductName("Gibson Les Paul Custom 2015 VS");
-        mock3.setProductAvailability(true);
-        mock3.setProductDescription("One and only, Gibson LP Custom!");
-        mock3.setProductPrice((float) 11999.99);
-        mock3.setProductStorageState(30);
-        mock3.setProductImagePath("src/resources/productImages/sample.jpg");
-        
-        mockInfo.add(mock1);
-        mockInfo.add(mock2);
-        mockInfo.add(mock3);
-        
-        return mockInfo;
+        DBConnector.Disconnect(conn);
+        return products;
     }
 }

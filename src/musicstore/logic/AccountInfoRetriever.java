@@ -41,6 +41,8 @@ public class AccountInfoRetriever {
                 info.setCartState(info.getCartState() + 1);
                 info.setTotalPrice(info.getTotalPrice() + rs.getFloat(1));
             }
+            rs.close();
+            stmt.close();
         } catch(Exception e) {
             Logger.getLogger(AccountInfoRetriever.class.getName()).log(Level.SEVERE, null, e);
         }
