@@ -140,7 +140,7 @@ public class MusicStoreBrowseProductsUI extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(() -> {
             MusicStoreBuyProductUI buyProduct = new MusicStoreBuyProductUI();
             buyProduct.setVisible(true);
-            buyProduct.LoadData(productsInfo.get(row), AccountInfoRetriever.GetAccountInfo(0));
+            buyProduct.LoadData(productsInfo.get(row), AccountInfoRetriever.GetAccountInfo(account.getId()));
             buyProduct.setContext(productsInfo);
         });
         this.setVisible(false);

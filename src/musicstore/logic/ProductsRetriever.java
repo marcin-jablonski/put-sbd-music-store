@@ -29,18 +29,24 @@ public class ProductsRetriever {
             if(filters == null){
                 stmt = conn.prepareStatement("SELECT BODY, PRICE, NAME, DESCRIPTION, STORAGESTATE, ID FROM GUITAR");
             }
-            else{
-                stmt = conn.prepareStatement("SELECT BODY, PRICE, NAME, DESCRIPTION, STORAGESTATE, ID FROM GUITAR WHERE BODY = ?, PRICE BETWEEN ? AND ?, NAME LIKE ?");
+            else if (!"".equals(filters.getProductName())) {
+                stmt = conn.prepareStatement("SELECT BODY, PRICE, NAME, DESCRIPTION, STORAGESTATE, ID FROM GUITAR WHERE BODY = ? AND PRICE BETWEEN ? AND ? AND NAME LIKE ?");
                 stmt.setString(1, filters.getBody());
                 stmt.setFloat(2, filters.getPriceMin());
                 stmt.setFloat(3, filters.getPriceMax());
                 stmt.setString(4, filters.getProductName());
             }
+            else{
+                stmt = conn.prepareStatement("SELECT BODY, PRICE, NAME, DESCRIPTION, STORAGESTATE, ID FROM GUITAR WHERE BODY = ? AND PRICE BETWEEN ? AND ?");
+                stmt.setString(1, filters.getBody());
+                stmt.setFloat(2, filters.getPriceMin());
+                stmt.setFloat(3, filters.getPriceMax());
+            }
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
                 ProductInfo info = new ProductInfo();
                 info.setId(rs.getInt(6));
-                info.setProductAvailability(rs.getInt(5) > 0 ? true : false);
+                info.setProductAvailability((rs.getInt(5) > 0));
                 info.setProductDescription(rs.getString(4));
                 info.setProductName(rs.getString(3));
                 info.setProductPrice(rs.getFloat(2));
