@@ -131,6 +131,7 @@ public class MusicStoreAccountDataPanel extends javax.swing.JPanel {
             MusicStoreCartUI cartUI = new MusicStoreCartUI();
             cartUI.setVisible(true);
             cartUI.SetContext(topFrame.GetProducts(), topFrame.GetAccount());
+            cartUI.LoadData();
         });
         
         topFrame.setVisible(false);

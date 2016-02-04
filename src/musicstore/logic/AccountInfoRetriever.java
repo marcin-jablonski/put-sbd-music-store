@@ -8,9 +8,14 @@ package musicstore.logic;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import musicstore.datastructures.AccountInfo;
+import musicstore.datastructures.ProductInfo;
 
 /**
  *
@@ -51,5 +56,27 @@ public class AccountInfoRetriever {
         info.setAvatarPath("src/resources/avatars/sample.jpg");
         info.setId(userID);
         return info;
+    }
+    
+    public static List<ProductInfo> GetCartItems(int accountId){
+        List<ProductInfo> products = new ArrayList<>();
+        Connection conn = DBConnector.Connect();
+        try {           
+            PreparedStatement stmt = conn.prepareStatement("SELECT p.NAME, p.PRICE FROM GUITAR p JOIN CARTITEM i ON p.ID = i.GUITAR WHERE i.CLIENT = ?");
+            stmt.setInt(1, accountId);
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()){
+                ProductInfo product = new ProductInfo();
+                product.setProductName(rs.getString(1));
+                product.setProductPrice(rs.getFloat(2));
+                products.add(product);
+            }
+            stmt.close();
+            rs.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(AccountInfoRetriever.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        DBConnector.Disconnect(conn);
+        return products;
     }
 }

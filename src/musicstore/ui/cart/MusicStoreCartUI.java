@@ -6,8 +6,10 @@
 package musicstore.ui.cart;
 
 import java.util.List;
+import javax.swing.table.DefaultTableModel;
 import musicstore.datastructures.AccountInfo;
 import musicstore.datastructures.ProductInfo;
+import musicstore.logic.AccountInfoRetriever;
 import musicstore.logic.AccountUpdater;
 import musicstore.ui.browseproducts.MusicStoreBrowseProductsUI;
 
@@ -74,7 +76,7 @@ public class MusicStoreCartUI extends javax.swing.JFrame {
 
         TotalPriceLabel.setText("Total price:");
 
-        TotalPrice.setText("0000");
+        TotalPrice.setText("0");
 
         BackToBrowseButton.setText("Back to browsing");
         BackToBrowseButton.addActionListener(new java.awt.event.ActionListener() {
@@ -99,14 +101,14 @@ public class MusicStoreCartUI extends javax.swing.JFrame {
                 .addGroup(CartPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(ItemsScrollable, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(CartPanelLayout.createSequentialGroup()
-                        .addGroup(CartPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(CartPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(BackToBrowseButton, javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, CartPanelLayout.createSequentialGroup()
                                 .addGap(30, 30, 30)
                                 .addComponent(TotalPriceLabel)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(TotalPrice)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 82, Short.MAX_VALUE)
+                                .addComponent(TotalPrice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 132, Short.MAX_VALUE)
                         .addComponent(PayButton)))
                 .addContainerGap())
         );
@@ -132,8 +134,8 @@ public class MusicStoreCartUI extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(CartPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(CartPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -164,7 +166,7 @@ public class MusicStoreCartUI extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(() -> {
             MusicStoreBrowseProductsUI browseUI = new MusicStoreBrowseProductsUI();
             browseUI.setVisible(true);
-            browseUI.SetContext(account);
+            browseUI.SetContext(AccountInfoRetriever.GetAccountInfo(account.getId()));
             browseUI.LoadData(context);
         });
         this.setVisible(false);
@@ -174,6 +176,17 @@ public class MusicStoreCartUI extends javax.swing.JFrame {
     public void SetContext(List<ProductInfo> products, AccountInfo account){
         this.context = products;
         this.account = account;
+    }
+    
+    public void LoadData(){
+        List<ProductInfo> cartItems = AccountInfoRetriever.GetCartItems(account.getId());
+        DefaultTableModel model = (DefaultTableModel) ItemsTable.getModel();
+        
+        cartItems.stream().forEach((ProductInfo product) -> {
+            model.addRow(new Object[]{product.getProductName(), product.getProductPrice()});
+            TotalPrice.setText(String.valueOf(product.getProductPrice() + Float.parseFloat(TotalPrice.getText())));
+        });
+        
     }
     /**
      * @param args the command line arguments

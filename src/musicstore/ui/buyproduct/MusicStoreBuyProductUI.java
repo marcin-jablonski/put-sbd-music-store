@@ -8,6 +8,7 @@ package musicstore.ui.buyproduct;
 import java.util.List;
 import musicstore.datastructures.AccountInfo;
 import musicstore.datastructures.ProductInfo;
+import musicstore.logic.AccountInfoRetriever;
 import musicstore.logic.AccountUpdater;
 import musicstore.ui.browseproducts.MusicStoreBrowseProductsUI;
 
@@ -93,7 +94,7 @@ public class MusicStoreBuyProductUI extends javax.swing.JFrame {
             MusicStoreBrowseProductsUI musicStoreBrowseProductsUI = new MusicStoreBrowseProductsUI();
             musicStoreBrowseProductsUI.setVisible(true);
             musicStoreBrowseProductsUI.LoadData(context);
-            musicStoreBrowseProductsUI.SetContext(account);
+            musicStoreBrowseProductsUI.SetContext(AccountInfoRetriever.GetAccountInfo(account.getId()));
         });
         this.setVisible(false);
         this.dispose();
@@ -109,7 +110,7 @@ public class MusicStoreBuyProductUI extends javax.swing.JFrame {
             MusicStoreBrowseProductsUI musicStoreBrowseProductsUI = new MusicStoreBrowseProductsUI();
             musicStoreBrowseProductsUI.setVisible(true);
             musicStoreBrowseProductsUI.LoadData(context);
-            musicStoreBrowseProductsUI.SetContext(account);
+            musicStoreBrowseProductsUI.SetContext(AccountInfoRetriever.GetAccountInfo(account.getId()));
         });
         this.setVisible(false);
         this.dispose();                   
