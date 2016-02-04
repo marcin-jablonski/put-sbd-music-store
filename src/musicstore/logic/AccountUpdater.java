@@ -101,8 +101,21 @@ public class AccountUpdater {
                 stmt.executeUpdate();
             }
             stmt.close();
+            
+            stmt = conn.prepareStatement("COMMIT");
+            stmt.execute();
+            stmt.close();
+            
         } catch (SQLException ex) {
-            Logger.getLogger(AccountUpdater.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                PreparedStatement stmt = conn.prepareStatement("ROLLBACK");
+                stmt.execute();
+                stmt.close();
+                
+                Logger.getLogger(AccountUpdater.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex1) {
+                Logger.getLogger(AccountUpdater.class.getName()).log(Level.SEVERE, null, ex1);
+            }
         }
         DBConnector.Disconnect(conn);
     }
